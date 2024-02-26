@@ -52,7 +52,7 @@ git push -u  origin setup_project
 # Update Project
  &emsp; If the current branch is behind the remote, then by default it will fast-forward the current branch to match the remote.
 ```
-git pull
+git pull origin main
 ```
 - If Git can't automatically merge the changes, it will stop and indicate that there are conflicts. Open the conflicted files in your text editor.
 - Inside the files, Git marks the conflicting sections. It typically looks like this:
