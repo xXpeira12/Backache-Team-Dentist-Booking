@@ -37,12 +37,12 @@ git add .
 git commit -m "<your commit message>"
 ```
 ```
-git push -u {your_branch}
+git push -u origin {your_branch}
 ```
  &emsp; for example
 ```
 git commit -m "Setup Project"
-git push -u setup_project
+git push -u  origin setup_project
 ```
 7. Create a pull request
 
