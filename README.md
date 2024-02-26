@@ -50,9 +50,17 @@ git push -u  origin setup_project
  &emsp; ![Screenshot 2024-02-23 232858](https://github.com/xXpeira12/Backache-Team-Dentist-Booking/assets/78487961/91ddf41d-a2d8-4512-bda7-804efe0d3f8e)
 
 # Update Project
- &emsp; If the current branch is behind the remote, then by default it will fast-forward the current branch to match the remote.
+ &emsp; If the current branch is behind the remote, then you need to change to branch you want the code.
 ```
-git pull origin main
+git checkout {branch name}
+```
+ &emsp; for example : Using code from main to update my local file
+```
+git checkout main
+```
+ &emsp; so you can fast-forward your local file to match the remote.
+```
+git pull
 ```
 - If Git can't automatically merge the changes, it will stop and indicate that there are conflicts. Open the conflicted files in your text editor.
 - Inside the files, Git marks the conflicting sections. It typically looks like this:
