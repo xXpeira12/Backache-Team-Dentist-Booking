@@ -1,4 +1,5 @@
 const Booking = require("../models/Booking");
+const Dentist = require("../models/Dentist");
 
 //@desc     ...
 //@route    ... /api/v1/...
@@ -50,6 +51,27 @@ exports.getBookings = async (req, res, next) => {
   }
 };
 
-//@desc     ...
-//@route    ... /api/v1/...
-//@access   ...
+//@desc     GET single booking
+//@route    GET /api/v1/bookings/:id
+//@access   Public
+exports.getBooking = async (req, res, next) => {
+  const query = Booking.findById(req.params.id).populate({
+    path: "dentist",
+    select: "name year_exp clinic",
+  });
+
+  if (!query) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Booking not found" });
+  }
+  try {
+    const booking = await query;
+    res.status(200).json({ success: true, data: booking });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ success: false, error: "Cannot find booking" });
+  }
+};
