@@ -1,15 +1,6 @@
 const mongoose = require('mongoose');
 
 const DentistSchema = new mongoose.Schema({
-    did: {
-        type: Number,
-        unique: true,
-        required: [true, 'Please add a Dentist Id'],
-        validate: {
-            validator: Number.isInteger,
-            message: '{VALUE} is not an integer value for Dentist Id'
-        }
-    },
     name: {
         type: String,
         required: [true, 'Please add a name']

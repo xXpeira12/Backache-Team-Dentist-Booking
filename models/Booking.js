@@ -1,26 +1,17 @@
 const mongoose = require('mongoose');
 
 const BookingSchema = new mongoose.Schema({
-    bid: {
-        type: Number,
-        unique: true,
-        required: [true, 'Please add a Booking Id'],
-        validate: {
-            validator: Number.isInteger,
-            message: '{VALUE} is not an integer value for Booking Id'
-        }
-    },
-    uid: {
+    user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
         required: true
     },
-    did: {
+    dentist: {
         type: mongoose.Schema.ObjectId,
         ref: 'Dentist',
         required: true
     },
-    date: {
+    bookDate: {
         type: Date,
         required: true,
         unique: true
