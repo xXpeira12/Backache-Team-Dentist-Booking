@@ -3,15 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
-    uid: {
-        type: Number,
-        unique: true,
-        required: [true, 'Please add a User Id'],
-        validate: {
-            validator: Number.isInteger,
-            message: '{VALUE} is not an integer value for User Id'
-        }
-    },
     name: {
         type: String,
         required: [true, 'Please add a name']
