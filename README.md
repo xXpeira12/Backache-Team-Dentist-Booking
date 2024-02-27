@@ -50,17 +50,22 @@ git push -u  origin setup_project
  &emsp; ![Screenshot 2024-02-23 232858](https://github.com/xXpeira12/Backache-Team-Dentist-Booking/assets/78487961/91ddf41d-a2d8-4512-bda7-804efe0d3f8e)
 
 # Update Project
- &emsp; If the current branch is behind the remote, then you need to change to branch you want the code.
-```
-git checkout {branch name}
-```
- &emsp; for example : Using code from main to update my local file
+ &emsp; If the current branch is behind the remote. First we'll update your local master branch. Go to your local project and check out the branch you want to merge into (your local master branch).
 ```
 git checkout main
 ```
- &emsp; so you can fast-forward your local file to match the remote.
 ```
-git pull
+git pull origin main
+```
+ &emsp; If it already up to date, Check out the branch you want to merge into.
+```
+git checkout {your_branch}
+git merge main
+```
+ &emsp; for example
+```
+git checkout setup_project
+git merge main
 ```
 - If Git can't automatically merge the changes, it will stop and indicate that there are conflicts. Open the conflicted files in your text editor.
 - Inside the files, Git marks the conflicting sections. It typically looks like this:
@@ -70,4 +75,12 @@ git pull
 =======
 // Incoming changes
 >>>>>>> new_changes
+```
+ &emsp; and then, push to your branch.
+```
+git push origin {your_branch}
+```
+ &emsp; for example
+```
+git push origin setup_project
 ```
