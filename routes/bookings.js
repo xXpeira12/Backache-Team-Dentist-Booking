@@ -3,6 +3,8 @@ const { getBookings } = require("../controllers/bookings");
 
 const router = express.Router((mergeParams = true));
 
-router.route("/").get(getBookings);
+const { protect, authorize } = require("../middleware/auth");
+
+router.route("/").get(protect, getBookings);
 
 module.exports = router;

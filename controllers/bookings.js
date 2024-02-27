@@ -12,16 +12,25 @@ exports.getBookings = async (req, res, next) => {
 
   //General user can see only his/her bookings
   if (req.user.role !== "admin") {
-    query = Booking.find({ user: req.user.id });
+    query = Booking.find({ user: req.user.id }).populate({
+      path: "dentist",
+      select: "name year_exp clinic",
+    });
   } else {
-    // Admin can see all bookings
+    //   Admin can see all bookings
     // If admin want to see bookings filtered by dentist
     if (req.params.dentistId) {
       console.log(req.params.dentistId);
-      query = Booking.find({ dentist: req.params.dentistId });
+      query = Booking.find({ dentist: req.params.dentistId }).populate({
+        path: "dentist",
+        select: "name year_exp clinic",
+      });
     } else {
-      // Admin want to see all bookings
-      query = Booking.find();
+      //Admin want to see all bookings
+      query = Booking.find().populate({
+        path: "dentist",
+        select: "name year_exp clinic",
+      });
     }
   }
 
