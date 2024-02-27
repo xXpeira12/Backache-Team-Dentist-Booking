@@ -55,17 +55,30 @@ exports.getBookings = async (req, res, next) => {
 //@route    GET /api/v1/bookings/:id
 //@access   Public
 exports.getBooking = async (req, res, next) => {
-  const query = Booking.findById(req.params.id).populate({
-    path: "dentist",
-    select: "name year_exp clinic",
-  });
-
-  if (!query) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Booking not found" });
-  }
   try {
+    let query = Booking.findById(req.params.id);
+
+    if (!query) {
+      return res.status(404).json({
+        success: false,
+        message: `No hospital with the id of ${req.params.id}`,
+      });
+    }
+
+    //add user Id to req.body
+    req.body.user = req.user.id;
+
+    //Check for existed booking
+    const existedBookings = await Booking.find({ user: req.user.id });
+
+    //If the user is not admin, and the user did not see own booking
+    if (req.user.role !== "admin" && existedBookings.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Cannot access this Booking",
+      });
+    }
+
     const booking = await query;
     res.status(200).json({ success: true, data: booking });
   } catch (err) {
