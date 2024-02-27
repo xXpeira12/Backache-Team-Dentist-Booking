@@ -1,6 +1,6 @@
-const express = require('express');
-const {} = require('../controllers/bookings');
+const express = require("express");
+const { getBookings } = require("../controllers/bookings");
 
-const router = express.Router();
+const router = express.Router((mergeParams = true));
 
 module.exports = router;
