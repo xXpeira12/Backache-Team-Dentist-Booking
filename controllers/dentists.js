@@ -88,7 +88,7 @@ exports.getDentists = async (req,res,next) =>{
 //@desc     Get single dentist
 //@route    Get /api/v1/dentists/:id
 //@access   Public 
-exports.getDentists = async (req,res,next) =>{
+exports.getDentist = async (req,res,next) =>{
     try {
         const dentist = await Dentist.findById(req.params.id);
         
