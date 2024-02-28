@@ -57,7 +57,7 @@ exports.getBooking = async (req, res, next) => {
     if (!query) {
       return res.status(404).json({
         success: false,
-        message: `No hospital with the id of ${req.params.id}`,
+        message: `No Booking with the id of ${req.params.id}`,
       });
     }
 
@@ -93,7 +93,6 @@ exports.addBooking = async (req, res, next) => {
     req.body.dentist = req.params.dentistId;
 
     const dentist = await Dentist.findById(req.params.dentistId);
-
     if (!dentist) {
       return res.status(404).json({
         success: false,
@@ -103,6 +102,7 @@ exports.addBooking = async (req, res, next) => {
 
     //add user Id to req.body
     req.body.user = req.user.id;
+    console.log(req.body);
 
     //Check for existed booking
     const existedBookings = await Booking.find({ user: req.user.id });
