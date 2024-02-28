@@ -7,7 +7,7 @@ const Dentist = require("../models/Dentist");
 const bookingRouter = require("./bookings"); // Game
 
 //Re-route into other resource routers             // Game
-router.use("/:dentistId/bookings", bookingRouter); // Game
+//router.use("/:dentistId/bookings", bookingRouter); // Game
 // ???
 
 
@@ -35,7 +35,7 @@ exports.getDentists = async (req,res,next) =>{
     let queryStr = JSON.stringify(reqQuery);
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
-    query  = Dentist.find(JSON.parse(queryStr)).populate('bookingRouter');
+    query  = Dentist.find(JSON.parse(queryStr)).populate('bookings');
 
     //select fields
     if(req.query.select){
@@ -49,7 +49,7 @@ exports.getDentists = async (req,res,next) =>{
         query =query.sort(sortBy);
     } 
     else{
-        query = query.sort('-createAt');
+        query = query.sort('name');
     }
 
     //Pagination
@@ -78,10 +78,18 @@ exports.getDentists = async (req,res,next) =>{
                 page:page-1,limit
             }
         }
-        res.status(200).json({success:true, count:de.length, pagination, data:dentists});
+        res.status(200).json({success:true, count:dentists.length, pagination, data:dentists});
     } catch (err) {
+        console.log(err.stack);
         res.status(400).json({success:false});
     }
+    // try{ 
+    //     const dentists = await Dentist.find();
+    //     res.status(200).json({success:true, count: dentists.length ,data:dentists});
+
+    // } catch(err){
+    //     res.status(400).json({success:false});
+    // }
 
 }
 
