@@ -32,7 +32,7 @@ const DentistSchema = new mongoose.Schema(
 //Cascade delete bookings when a dentist is deleted
 DentistSchema.pre(
   "deleteOne",
-  { document: false, query: true },
+  { document: true, query: false },
   async function (next) {
     console.log(`Bookings being removed from dentist ${this._id}`);
     await this.model("Booking").deleteMany({ dentist: this._id });
@@ -47,6 +47,5 @@ DentistSchema.virtual("bookings", {
   foreignField: "dentist",
   justOne: false,
 });
-
 
 module.exports = mongoose.model("Dentist", DentistSchema);
