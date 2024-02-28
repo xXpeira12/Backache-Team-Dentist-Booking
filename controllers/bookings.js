@@ -1,10 +1,6 @@
 const Booking = require("../models/Booking");
 const Dentist = require("../models/Dentist");
 
-//@desc     ...
-//@route    ... /api/v1/...
-//@access   ...
-
 //@desc     GET all bookings
 //@route    GET /api/v1/bookings
 //@access   Public
