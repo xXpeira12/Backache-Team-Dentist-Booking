@@ -109,7 +109,7 @@ exports.addBooking = async (req, res, next) => {
       dentist: req.params.dentistId,
       bookDate: req.body.bookDate,
     });
-    console.log(existedBookings);
+    // console.log(existedBookings);
 
     //If the user is not admin, and the user can book only date and dentist is a unique
     if (req.user.role !== "admin" && existedBookings) {
@@ -119,13 +119,15 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
-    // Older version
-    // if (req.user.role !== "admin" && existedBookings.length > 0) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: "Cannot book more than one time",
-    //   });
-    // }
+    //Check millisecond of date
+    const milli = req.body.bookDate.slice(19);
+    if (milli !== ".000Z") {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
+      });
+    }
 
     const booking = await Booking.create(req.body);
 
@@ -137,7 +139,8 @@ exports.addBooking = async (req, res, next) => {
     console.log(err);
     return res.status(500).json({
       success: false,
-      error: "Cannot create booking",
+      error:
+        "Cannot create booking or Invalid date format Please use YYYY-MM-DDTHH:00:00",
     });
   }
 };
