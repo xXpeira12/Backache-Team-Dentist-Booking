@@ -102,18 +102,30 @@ exports.addBooking = async (req, res, next) => {
 
     //add user Id to req.body
     req.body.user = req.user.id;
-    console.log(req.body);
+    // console.log(req.body);
 
     //Check for existed booking
-    const existedBookings = await Booking.find({ user: req.user.id });
+    const existedBookings = await Booking.findOne({
+      dentist: req.params.dentistId,
+      bookDate: req.body.bookDate,
+    });
+    console.log(existedBookings);
 
     //If the user is not admin, and the user can book only date and dentist is a unique
-    if (req.user.role !== "admin" && existedBookings.length > 0) {
+    if (req.user.role !== "admin" && existedBookings) {
       return res.status(404).json({
         success: false,
-        message: "Cannot book more than one time",
+        message: "Cannot book at the same time",
       });
     }
+
+    // Older version
+    // if (req.user.role !== "admin" && existedBookings.length > 0) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "Cannot book more than one time",
+    //   });
+    // }
 
     const booking = await Booking.create(req.body);
 
