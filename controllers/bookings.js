@@ -105,14 +105,14 @@ exports.addBooking = async (req, res, next) => {
     // console.log(req.body);
 
     //Check for existed booking
-    const existedBookings = await Booking.findOne({
+    const bookingExists = await Booking.exists({
       dentist: req.params.dentistId,
       bookDate: req.body.bookDate,
     });
-    // console.log(existedBookings);
+    // console.log(bookingExists);
 
     //If the user is not admin, and the user can book only date and dentist is a unique
-    if (req.user.role !== "admin" && existedBookings) {
+    if (req.user.role !== "admin" && bookingExists) {
       return res.status(404).json({
         success: false,
         message: "Cannot book at the same time",
@@ -126,6 +126,21 @@ exports.addBooking = async (req, res, next) => {
         success: false,
         message:
           "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
+      });
+    }
+
+    const bookHour = req.body.bookDate.slice(11, 13);
+
+    if (
+      !(
+        (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
+        (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
+      )
+    ) {
+      // console.log(parseInt(bookHour));
+      return res.status(404).json({
+        success: false,
+        message: "Invalid time. Please book between 9-11 or 13-16",
       });
     }
 

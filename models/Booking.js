@@ -25,12 +25,10 @@ const BookingSchema = new mongoose.Schema({
   },
 });
 
-BookingSchema.index({ bookDate: 1, dentist: 1 }, { unique: true });
-
 function isValidDateFormat(dateString) {
   const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:00:00$/;
   newDate = dateString.toISOString().slice(0, 19);
-  console.log("dataString" + newDate);
+  // console.log("dataString" + newDate);
   return regex.test(newDate);
 }
 
