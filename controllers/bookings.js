@@ -119,6 +119,20 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
+    //Check this user has already booked at this time or not
+    const bookingExistuser = await Booking.exists({
+      user: req.body.user,
+      bookDate: req.body.bookDate,
+    });
+
+    //If this user is not admin, and this user can book one date for one dentist
+    if (req.user.role !== "admin" && bookingExistuser) {
+      return res.status(404).json({
+        success: false,
+        message: "Cannot book at the same time",
+      });
+    }
+
     //Check millisecond of date
     const milli = req.body.bookDate.slice(19);
     if (milli !== ".000Z") {
