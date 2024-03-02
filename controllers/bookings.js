@@ -102,16 +102,60 @@ exports.addBooking = async (req, res, next) => {
 
     //add user Id to req.body
     req.body.user = req.user.id;
-    console.log(req.body);
+    // console.log(req.body);
 
     //Check for existed booking
-    const existedBookings = await Booking.find({ user: req.user.id });
+    const bookingExists = await Booking.exists({
+      dentist: req.params.dentistId,
+      bookDate: req.body.bookDate,
+    });
+    // console.log(bookingExists);
 
     //If the user is not admin, and the user can book only date and dentist is a unique
-    if (req.user.role !== "admin" && existedBookings.length > 0) {
+    if (req.user.role !== "admin" && bookingExists) {
       return res.status(404).json({
         success: false,
-        message: "Cannot book more than one time",
+        message: "Cannot book at the same time",
+      });
+    }
+
+    //Check this user has already booked at this time or not
+    const bookingExistuser = await Booking.exists({
+      user: req.body.user,
+      bookDate: req.body.bookDate,
+    });
+
+    //If this user is not admin, and this user can book one date for one dentist
+    if (req.user.role !== "admin" && bookingExistuser) {
+      return res.status(404).json({
+        success: false,
+        message: "Cannot book at the same time",
+      });
+    }
+
+    //Check millisecond of date
+    const milli = req.body.bookDate.slice(19);
+    if (milli !== ".000Z") {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
+      });
+    }
+
+    //Check for booking time
+    const bookHour = req.body.bookDate.slice(11, 13);
+
+    if (
+      !(
+        (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
+        (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
+      )
+    ) {
+      // console.log(parseInt(bookHour));
+      return res.status(404).json({
+        success: false,
+        message: "Invalid time. Please book between 9-11 or 13-16",
       });
     }
 
@@ -125,7 +169,8 @@ exports.addBooking = async (req, res, next) => {
     console.log(err);
     return res.status(500).json({
       success: false,
-      error: "Cannot create booking",
+      error:
+        "Cannot create booking or Invalid date format Please use YYYY-MM-DDTHH:00:00",
     });
   }
 };
@@ -153,6 +198,160 @@ exports.updateBooking = async (req, res, next) => {
       });
     }
 
+    const newDentist = req.body.dentist;
+    const newBookDate = req.body.bookDate;
+
+    // -------------------  Change dentist only  ---------------------------------//
+    if (newDentist && !newBookDate) {
+      console.log("Change dentist only");
+      //Check for existed booking
+      const bookingExists = await Booking.exists({
+        dentist: newDentist,
+        bookDate: booking.bookDate,
+      });
+      //Dentist not available
+      if (bookingExists) {
+        return res.status(404).json({
+          success: false,
+          message: "Cannot book at the same time",
+        });
+      }
+    }
+
+    // -------------------  Change date only  ---------------------------------//
+    if (!newDentist && newBookDate) {
+      console.log("Change date only");
+      //Check for existed booking
+      const bookingExists = await Booking.exists({
+        dentist: booking.dentist,
+        bookDate: newBookDate,
+      });
+      //Dentist not available
+      if (bookingExists) {
+        return res.status(404).json({
+          success: false,
+          message: "Cannot book at the same time",
+        });
+      }
+
+      //Check this user has already booked at this time or not
+      if (req.user.role !== "admin") {
+        const bookingExistuser = await Booking.exists({
+          user: req.user.id,
+          bookDate: newBookDate,
+        });
+        if (bookingExistuser) {
+          return res.status(404).json({
+            success: false,
+            message: "Cannot book at the same time",
+          });
+        }
+      } else {
+        const bookingExistuser = await Booking.exists({
+          user: booking.user,
+          bookDate: newBookDate,
+        });
+        if (bookingExistuser) {
+          return res.status(404).json({
+            success: false,
+            message: "Cannot book at the same time",
+          });
+        }
+      }
+
+      //Check millisecond of date
+      const milli = newBookDate.slice(19);
+      if (milli !== ".000Z") {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
+        });
+      }
+
+      //Check for booking time
+      const bookHour = newBookDate.slice(11, 13);
+      if (
+        !(
+          (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
+          (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
+        )
+      ) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid time. Please book between 9-11 or 13-16",
+        });
+      }
+    }
+
+    // -------------------  Change dentist and date  ---------------------------------//
+    if (newDentist && newBookDate) {
+      console.log("Change dentist and date");
+
+      //Check for existed booking
+      const bookingExists = await Booking.exists({
+        dentist: newDentist,
+        bookDate: newBookDate,
+      });
+
+      //Dentist not available
+      if (bookingExists) {
+        return res.status(404).json({
+          success: false,
+          message: "Cannot book at the same time",
+        });
+      }
+
+      //Check this user has already booked at this time or not
+      if (req.user.role !== "admin") {
+        const bookingExistuser = await Booking.exists({
+          user: req.user.id,
+          bookDate: newBookDate,
+        });
+        if (bookingExistuser) {
+          return res.status(404).json({
+            success: false,
+            message: "Cannot book at the same time",
+          });
+        }
+      } else {
+        const bookingExistuser = await Booking.exists({
+          user: booking.user,
+          bookDate: newBookDate,
+        });
+        if (bookingExistuser) {
+          return res.status(404).json({
+            success: false,
+            message: "Cannot book at the same time",
+          });
+        }
+      }
+
+      //Check millisecond of date
+      const milli = newBookDate.slice(19);
+      if (milli !== ".000Z") {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
+        });
+      }
+
+      //Check for booking time
+      const bookHour = newBookDate.slice(11, 13);
+      if (
+        !(
+          (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
+          (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
+        )
+      ) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid time. Please book between 9-11 or 13-16",
+        });
+      }
+    }
+
     //Update booking
     booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -164,7 +363,8 @@ exports.updateBooking = async (req, res, next) => {
     console.log(err);
     return res.status(500).json({
       success: false,
-      error: "Cannot update booking",
+      error:
+        "Cannot update booking or Invalid date format Please use YYYY-MM-DDTHH:00:00",
     });
   }
 };
