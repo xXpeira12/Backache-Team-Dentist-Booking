@@ -100,6 +100,7 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
+    //New adding by Game
     //Check req.body.user is null or not
     if (req.body.user === null) {
       //add user Id to req.body
