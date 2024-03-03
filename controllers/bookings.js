@@ -100,10 +100,6 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
-    //add user Id to req.body
-    req.body.user = req.user.id;
-    // console.log(req.body);
-
     //Check for existed booking
     const bookingExists = await Booking.exists({
       dentist: req.params.dentistId,
@@ -118,6 +114,18 @@ exports.addBooking = async (req, res, next) => {
         message: "Cannot book at the same time",
       });
     }
+
+    //Check ths user is not admin, and this user cannot book for other user
+    if (req.user.role !== "admin" && req.body.user !== req.user.id) {
+      return res.status(404).json({
+        success: false,
+        message: "Cannot book for other user",
+      });
+    }
+
+    //add user Id to req.body
+    req.body.user = req.user.id;
+    // console.log(req.body);
 
     //Check this user has already booked at this time or not
     const bookingExistuser = await Booking.exists({
