@@ -100,6 +100,13 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
+    //Check req.body.user is null or not
+    if (req.body.user === null) {
+      //add user Id to req.body
+      req.body.user = req.user.id;
+      // console.log(req.body);
+    }
+
     //Check for existed booking
     const bookingExists = await Booking.exists({
       dentist: req.params.dentistId,
@@ -122,10 +129,6 @@ exports.addBooking = async (req, res, next) => {
         message: "Cannot book for other user",
       });
     }
-
-    //add user Id to req.body
-    req.body.user = req.user.id;
-    // console.log(req.body);
 
     //Check this user has already booked at this time or not
     const bookingExistuser = await Booking.exists({
