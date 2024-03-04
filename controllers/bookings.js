@@ -100,12 +100,39 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
-    //Check req.body.user is null or not
-    // if (req.body.user === null) {
-    //add user Id to req.body
-    // req.body.user = req.user.id;
-    // console.log(req.body);
-    // }
+    //Check millisecond of date
+    const milli = req.body.bookDate.slice(19);
+    if (milli !== ".000Z") {
+      if (!milli.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Invalid date format Please use YYYY-MM-DDTHH:00:00 or YYYY-MM-DDTHH:00:00.000Z",
+        });
+      }
+    }
+
+    //Check for booking time
+    const bookHour = req.body.bookDate.slice(11, 13);
+    if (
+      !(
+        (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
+        (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
+      )
+    ) {
+      // console.log(parseInt(bookHour));
+      return res.status(404).json({
+        success: false,
+        message: "Invalid time. Please book between 9-11 or 13-16",
+      });
+    }
+
+    let convertDate = new Date(req.body.bookDate);
+    if((req.body.bookDate.slice(19)).length === 0){
+      const tempDate = new Date(req.body.bookDate);
+      convertDate = new Date(tempDate.getTime() + (7 * 60 * 60 * 1000));
+    }
+    req.body.bookDate = convertDate;
 
     //Check for existed booking
     const bookingExists = await Booking.exists({
@@ -141,34 +168,6 @@ exports.addBooking = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: "Cannot book at the same time",
-      });
-    }
-
-    //Check millisecond of date
-    const milli = req.body.bookDate.slice(19);
-    if (milli !== ".000Z") {
-      if (!milli.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
-        });
-      }
-    }
-
-    //Check for booking time
-    const bookHour = req.body.bookDate.slice(11, 13);
-
-    if (
-      !(
-        (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
-        (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
-      )
-    ) {
-      // console.log(parseInt(bookHour));
-      return res.status(404).json({
-        success: false,
-        message: "Invalid time. Please book between 9-11 or 13-16",
       });
     }
 
@@ -210,6 +209,40 @@ exports.updateBooking = async (req, res, next) => {
         message: `User ${req.user.id} not authorized to update booking`,
       });
     }
+
+    //Check millisecond of date
+    const milli = req.body.bookDate.slice(19);
+    if (milli !== ".000Z") {
+      if (!milli.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Invalid date format Please use YYYY-MM-DDTHH:00:00 or YYYY-MM-DDTHH:00:00.000Z",
+        });
+      }
+    }
+
+    //Check for booking time
+    const bookHour = req.body.bookDate.slice(11, 13);
+    if (
+      !(
+        (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
+        (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
+      )
+    ) {
+      // console.log(parseInt(bookHour));
+      return res.status(404).json({
+        success: false,
+        message: "Invalid time. Please book between 9-11 or 13-16",
+      });
+    }
+
+    let convertDate = new Date(req.body.bookDate);
+    if((req.body.bookDate.slice(19)).length === 0){
+      const tempDate = new Date(req.body.bookDate);
+      convertDate = new Date(tempDate.getTime() + (7 * 60 * 60 * 1000));
+    }
+    req.body.bookDate = convertDate;
 
     const newDentist = req.body.dentist;
     const newBookDate = req.body.bookDate;
@@ -271,30 +304,6 @@ exports.updateBooking = async (req, res, next) => {
           });
         }
       }
-
-      //Check millisecond of date
-      const milli = newBookDate.slice(19);
-      if (milli !== ".000Z") {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
-        });
-      }
-
-      //Check for booking time
-      const bookHour = newBookDate.slice(11, 13);
-      if (
-        !(
-          (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
-          (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
-        )
-      ) {
-        return res.status(404).json({
-          success: false,
-          message: "Invalid time. Please book between 9-11 or 13-16",
-        });
-      }
     }
 
     // -------------------  Change dentist and date  ---------------------------------//
@@ -339,30 +348,6 @@ exports.updateBooking = async (req, res, next) => {
           });
         }
       }
-
-      //Check millisecond of date
-      const milli = newBookDate.slice(19);
-      if (milli !== ".000Z") {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
-        });
-      }
-
-      //Check for booking time
-      const bookHour = newBookDate.slice(11, 13);
-      if (
-        !(
-          (9 <= parseInt(bookHour) && parseInt(bookHour) <= 11) ||
-          (13 <= parseInt(bookHour) && parseInt(bookHour) <= 16)
-        )
-      ) {
-        return res.status(404).json({
-          success: false,
-          message: "Invalid time. Please book between 9-11 or 13-16",
-        });
-      }
     }
 
     //Update booking
@@ -377,7 +362,7 @@ exports.updateBooking = async (req, res, next) => {
     return res.status(500).json({
       success: false,
       error:
-        "Cannot update booking or Invalid date format Please use YYYY-MM-DDTHH:00:00",
+        "Cannot update booking or Invalid date format Please use YYYY-MM-DDTHH:00:00 or YYYY-MM-DDTHH:00:00.000Z",
     });
   }
 };
