@@ -100,13 +100,12 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
-    //New adding by Game
     //Check req.body.user is null or not
-    if (req.body.user === null) {
-      //add user Id to req.body
-      req.body.user = req.user.id;
-      // console.log(req.body);
-    }
+    // if (req.body.user === null) {
+    //add user Id to req.body
+    // req.body.user = req.user.id;
+    // console.log(req.body);
+    // }
 
     //Check for existed booking
     const bookingExists = await Booking.exists({
@@ -148,11 +147,13 @@ exports.addBooking = async (req, res, next) => {
     //Check millisecond of date
     const milli = req.body.bookDate.slice(19);
     if (milli !== ".000Z") {
-      return res.status(404).json({
-        success: false,
-        message:
-          "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
-      });
+      if (!milli.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Invalid date format Please use YYYY-MM-DDTHH:00:00 with no millisecond",
+        });
+      }
     }
 
     //Check for booking time
