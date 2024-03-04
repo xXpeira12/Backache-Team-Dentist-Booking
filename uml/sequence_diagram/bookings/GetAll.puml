@@ -1,0 +1,30 @@
+@startuml Booking (GET)
+
+header Dentist-Booking-System Sequence Diagram
+title "Booking (GET)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:bookings" as bookingRouter
+participant "<<middleware>>\n:auth" as authMiddleware
+participant "<<controllers>>\n:bookings" as bookingController
+participant "<<models>>\n:Booking" as bookingModel
+database "<<MongoDB>>\n:bookings" as bookingDatabase
+
+client -> server ++: req.get('/bookings')
+server -> bookingRouter ++: app.use('/bookings', bookings)
+bookingRouter ->> authMiddleware ++: protect()
+
+alt Not Authorized
+   authMiddleware ->> client --: Unprotected
+
+else Authorized
+   bookingRouter <<- authMiddleware --: Protected
+   bookingRouter -> bookingController ++: getBookings()
+   bookingController -> bookingModel ++: find()
+   bookingModel -> bookingDatabase ++: bookingSchema
+   bookingDatabase --> bookingModel --: bookings
+   bookingController <-- bookingModel --: bookings
+client <--bookingController--: response
+end
+@enduml

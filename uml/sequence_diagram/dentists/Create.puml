@@ -1,0 +1,28 @@
+@startuml Dentists (POST)
+    header Dentist-Booking-System Sequence Diagram
+    title "Dentist(POST)"
+
+    participant "Client" as client
+    participant "<<javaScript>>\n:server" as server
+    participant "<<router>>\n:dentists" as dentistsRouter
+    participant "<<middleware>>\n:auth" as authMiddleware
+    participant "<<controllers>>\n:dentists" as dentistsController
+    participant "<<models>>\n:Dentist" as dentistModel
+    database "<<MongoDB>>\n:dentists" as dentistsDatabase
+
+    client -> server ++: req.post('/dentists')
+    server -> dentistsRouter ++: app.use('/dentists', dentists)
+    dentistsRouter ->> authMiddleware ++: protect(), authorize('admin')
+    alt Not Authorized
+        authMiddleware ->> client --: Unauthorized or unprotected
+    else Authorized
+    authMiddleware ->> dentistsRouter --: authorized and protected
+    dentistsRouter -> dentistsController ++: CreateDentist()
+    dentistsController -> dentistModel ++: create(req.body)
+    dentistModel -> dentistsDatabase ++: DentistSchema
+    dentistModel <-- dentistsDatabase --: dentist
+    dentistsController <-- dentistModel --: dentist
+    client <-- dentistsController --: response
+    end
+
+@enduml
