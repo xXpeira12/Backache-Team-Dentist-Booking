@@ -1,0 +1,33 @@
+@startuml Dentist (DELETE)
+header Dentist-Booking-System Sequence Diagram
+title "Dentist (DELETE)"
+
+participant "Client" as client
+participant "<<javascript>>\n:server" as server
+participant "<<router>>\n:dentists" as dentistRouter
+participant "<<middleware>>\n:auth" as authMiddleware
+participant "<<controllers>>\n:dentists" as dentistController
+participant "<<models>>\n:Dentist" as dentistModel
+participant "<<models>>\n:Booking" as bookingModel
+database "<<MongoDB>>\n:dentists" as dentistDatabase
+database "<<MongoDB>>\n:bookings" as bookingDatabase
+
+client -> server ++: req.get('/dentists')
+server -> dentistRouter ++: app.use('/dentists', dentists)
+dentistRouter ->> authMiddleware ++: protect(), authorize('admin')
+alt Not Authorized
+    authMiddleware ->> client --: Unauthorized or unprotected
+else Authorized
+    authMiddleware ->> dentistRouter --: Authorized and protected
+    dentistRouter -> dentistController ++: deleteDentist()
+    dentistController -> dentistModel ++: findById(req.params.id)
+    dentistModel -> bookingModel ++: deleteMany({ dentist: this._id })
+    bookingModel -> bookingDatabase ++: bookingSchema
+    bookingModel <-- bookingDatabase --: response
+    dentistModel <-- bookingModel --: response
+    dentistModel -> dentistDatabase ++: dentistSchema
+    dentistDatabase --> dentistModel --: dentist
+    dentistModel --> dentistController --: dentist
+    client <-- dentistController --: response
+end
+@enduml

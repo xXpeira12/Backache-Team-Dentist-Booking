@@ -1,0 +1,27 @@
+@startuml Dentist (PUT)
+header Dentist-Booking-System Sequence Diagram
+title "Dentist (PUT)"
+
+participant "Client" as client
+participant "<<javascript>>\n:server" as server
+participant "<<router>>\n:dentists" as dentistRouter
+participant "<<middleware>>\n:auth" as authMiddleware
+participant "<<controllers>>\n:dentists" as dentistController
+participant "<<models>>\n:Dentist" as dentistModel
+database "<<MongoDB>>\n:dentists" as dentistDatabase
+
+client -> server ++: req.get('/dentists')
+server -> dentistRouter ++: app.use('/dentists', dentists)
+dentistRouter ->> authMiddleware ++: protect(), authorize('admin')
+alt Not Authorized
+    authMiddleware ->> client --: Unauthorized or unprotected
+else Authorized
+    authMiddleware ->> dentistRouter --: Authorized and protected
+    dentistRouter -> dentistController ++: updateDentist()
+    dentistController -> dentistModel ++: findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+    dentistModel -> dentistDatabase ++: dentistSchema
+    dentistDatabase --> dentistModel --: dentist
+    dentistModel --> dentistController --: dentist
+    client --> dentistController --: response
+end
+@enduml

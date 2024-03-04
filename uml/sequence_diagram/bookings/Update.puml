@@ -1,0 +1,27 @@
+@startuml Booking(PUT)
+    header Dentist-Booking-System Sequence Diagram
+    title "Booking(PUT)"
+
+    participant "Client" as client
+    participant "<<javaScript>>\n:server" as server
+    participant "<<router>>\n:bookings" as bookingRouter
+    participant "<<middleware>>\n:auth" as authMiddleware
+    participant "<<controllers>>\n:bookings" as bookingController
+    participant "<<models>>\n:Booking" as bookingModel
+    database "<<MongoDB>>\n:bookings" as bookingDatabase
+
+    client -> server ++: req.put('/bookings/:id')
+    server -> bookingRouter ++: app.use('/bookings', bookings)
+    bookingRouter ->> authMiddleware ++: protect(), authorize('admin', 'user')
+    alt Not Authorized
+        authMiddleware ->> client --: Unauthorized or unprotected
+    else Authorized
+        authMiddleware ->> bookingRouter --: Authorized and protected
+    bookingRouter -> bookingController ++: updateBooking()
+    bookingController -> bookingModel ++: findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+    bookingModel -> bookingDatabase ++: bookingschema
+    bookingModel <-- bookingDatabase --: booking
+    bookingController <-- bookingModel --: booking
+    client <-- bookingController --: response
+    end
+@enduml

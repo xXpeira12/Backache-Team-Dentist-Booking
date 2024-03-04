@@ -1,0 +1,20 @@
+@startuml Dentist (GET)
+header Dentist-Booking-System Sequence Diagram
+title "Dentist (GET)"
+
+participant "Client" as client
+participant "<<javascript>>\n:server" as server
+participant "<<router>>\n:dentists" as dentistRouter
+participant "<<controllers>>\n:dentists" as dentistController
+participant "<<models>>\n:Dentist" as dentistModel
+database "<<MongoDB>>\n:dentists" as dentistDatabase
+
+client -> server ++: req.get('/dentists')
+server -> dentistRouter ++: app.use('/dentists', dentists)
+dentistRouter -> dentistController ++: getDentists()
+dentistController -> dentistModel ++: find()
+dentistModel -> dentistDatabase ++: dentistSchema
+dentistDatabase --> dentistModel --: dentists
+dentistModel --> dentistController --: dentists
+client <-- dentistController --: response
+@enduml

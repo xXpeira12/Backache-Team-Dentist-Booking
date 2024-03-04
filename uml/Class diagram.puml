@@ -1,0 +1,78 @@
+@startuml booking dentist
+left to right direction
+package "DENTDIARY-Backache" {
+    class "<<Application>>\nServer" as Server {}
+
+    class "<<Representation>>\nUser Model" as UserModel {
+        +String name
+        +String email
+        +String password
+        +String tel
+        +String role
+        +Date createdAt
+    }
+
+    class "<<Representation>>\nDentist Model" as DentistModel {
+        +String name
+        +Number year_exp
+        +String clinic
+        +Date createdAt
+    }
+
+    class "<<Representation>>\nBooking Model" as BookingModel {
+        +ObjectId user
+        +ObjectId dentist
+        +Date bookDate
+        +Date createdAt
+    }
+
+    class "<<Resource>>\nAuth" as AuthController {
+        <<POST>> +login(): Token
+        <<POST>> +register(): Token
+        <<GET>> +getme(): User
+        <<GET>> +logout(): void
+    }
+
+    class "<<Resource>>\nBooking" as BookingController {
+        <<GET>> +getBookings(): Bookings[]
+        <<POST>> +addBooking(): Booking
+    }
+
+     class "<<Resource>>\nBookingId" as BookingIdController {
+        <<GET>> +getBooking(id): Booking
+        <<PUT>> +updateBooking(id): Reservation
+        <<DELETE>> +deleteBooking(id): void
+    }
+
+    class "<<Resource>>\nDentist" as DentistController {
+        <<GET>> +getDentists(): Dentists[]
+        <<POST>> +createDentist(): Dentist
+    }
+    
+    class "<<Resource>>\nDentistId" as DentistIdController {
+        <<GET>> +getDentist(id): Dentist
+        <<PUT>> +updateDentist(id): Dentist
+        <<DELETE>> +deleteDentist(id): void
+    }
+
+    class "<<Resource>>\nAuth Middleware" as AuthMiddleware {
+        +protect()
+        +authorize(roles)
+        +verifyToken()
+    }
+}
+
+Server ..> AuthController : "/auth\n<<Path>>"
+Server ..> DentistController : "/dentists\n<<Path>>"
+Server ..> BookingController : "/bookings\n<<Path>>"
+
+AuthController ..> AuthMiddleware : "<<verify user>>"
+AuthMiddleware ..> UserModel : "<<uses>>"
+
+DentistController ..> DentistIdController : "/{dentistId}\n<<Path>>"
+BookingController ..> BookingIdController : "/{bookingId}\n<<Path>>" 
+
+BookingIdController ..> BookingModel : "<<uses>>"
+DentistIdController ..> DentistModel : "<<uses>>"
+
+@enduml
