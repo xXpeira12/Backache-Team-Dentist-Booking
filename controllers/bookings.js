@@ -127,12 +127,12 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
-    let convertDate = new Date(req.body.bookDate);
-    if((req.body.bookDate.slice(19)).length === 0){
-      const tempDate = new Date(req.body.bookDate);
-      convertDate = new Date(tempDate.getTime() + (7 * 60 * 60 * 1000));
-    }
-    req.body.bookDate = convertDate;
+    // let convertDate = new Date(req.body.bookDate);
+    // if((req.body.bookDate.slice(19)).length === 0){
+    //   const tempDate = new Date(req.body.bookDate);
+    //   convertDate = new Date(tempDate.getTime() + (7 * 60 * 60 * 1000));
+    // }
+    // req.body.bookDate = convertDate;
 
     //Check for existed booking
     const bookingExists = await Booking.exists({
