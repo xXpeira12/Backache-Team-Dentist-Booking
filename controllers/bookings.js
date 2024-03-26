@@ -320,7 +320,7 @@ exports.updateBooking = async (req, res, next) => {
       if (bookingExists) {
         return res.status(404).json({
           success: false,
-          message: "Cannot book at the same time",
+          message: "Dentist is already booked at this time",
         });
       }
 
@@ -333,18 +333,17 @@ exports.updateBooking = async (req, res, next) => {
         if (bookingExistuser) {
           return res.status(404).json({
             success: false,
-            message: "Cannot book at the same time",
+            message: "You have already booked an appointment at this time",
           });
         }
       } else {
         const bookingExistuser = await Booking.exists({
-          user: booking.user,
           bookDate: newBookDate,
         });
         if (bookingExistuser) {
           return res.status(404).json({
             success: false,
-            message: "Cannot book at the same time",
+            message: "Another user has already booked an appointment at this time",
           });
         }
       }
