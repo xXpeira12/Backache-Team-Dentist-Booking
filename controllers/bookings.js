@@ -338,6 +338,7 @@ exports.updateBooking = async (req, res, next) => {
         }
       } else {
         const bookingExistuser = await Booking.exists({
+          user: booking.user,
           bookDate: newBookDate,
         });
         if (bookingExistuser) {
